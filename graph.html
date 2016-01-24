@@ -44,7 +44,13 @@
       // intent
       const decrement$ = sources.DOM
         .select('#minus').events('click')
-        .map(ev => -1);
+        .flatMap(function (ev) {
+          return Rx.Observable.fromPromise(moveEvent().then(x => ev))
+        })
+        .map(ev => {
+          console.log('-1');
+          return -1
+        });
 
       const increment$ = sources.DOM
         .select('#plus').events('click')
@@ -67,7 +73,6 @@
 
     Cycle.run(main, { DOM: CycleDOM.makeDOMDriver('#app') });
 
-
     setTimeout(function () {
       // drawing code
       var w = window,
@@ -80,11 +85,38 @@
       // Creates canvas 320 × 200 at 10, 50
       var paper = Raphael(0, 0, x, y);
 
-      // Creates circle at x = 50, y = 40, with radius 10
-      var circle = paper.circle(50, 40, 10);
-
-      // Sets the fill attribute of the circle to red (#f00)
-      circle.attr("fill", "#f00");
+      function moveEvent() {
+        var conn = c1;
+        var n = conn.line.getTotalLength()
+        var pos = conn.line.getPointAtLength(0)
+        var radius = 5
+        var circle = paper.circle(pos.x, pos.y, 10);
+        circle.attr({
+          cx: pos.x,
+          cy: pos.y,
+          stroke: '#000'
+        })
+        var counter = 0;
+        return new Promise(function (resolve) {
+          var interval;
+          function animate() {
+            if (n < counter) {
+              clearInterval(interval);
+              circle.remove();
+              resolve();
+              return;
+            }
+            var pos = conn.line.getPointAtLength(counter);
+            circle.attr({
+              cx: pos.x,
+              cy: pos.y
+            })
+            counter += 1;
+          }
+          interval = setInterval(animate, 10);
+        })
+      }
+      window.moveEvent = moveEvent;
 
       var decClicks = paper.rect(400, 150, 100, 50)
       decClicks.attr('fill', '#ffe')
@@ -150,13 +182,7 @@
       vtree$Text.attr({ text: 'vtree$', 'font-size': '15px' })
 
       var c6 = paper.connection(scan, vtree, '#333')
-
       var c7 = paper.connection(vtree, document.querySelector('#app'), '#333')
-
-      var n = c1.line.getTotalLength()
-      console.log(n)
-      var pos = c1.line.getPointAtLength(0)
-      circle.attr({cx: pos.x, cy: pos.y})
     }, 0);
   </script>
 </body>
