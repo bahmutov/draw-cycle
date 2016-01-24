@@ -1,6 +1,37 @@
 # draw-cycle
 > Simple Cycle.js application visualized: streams, events, DOM
 
+![demo.gif](demo.gif)
+
+Full video in original resolution at [https://youtu.be/-5-xyhd5fbQ](https://youtu.be/-5-xyhd5fbQ)
+
+Simple Cycle.js taken from "Explicit dataflow" section at 
+[http://cycle.js.org/](http://cycle.js.org/) - here is the application's code
+
+```js
+function main(sources) {
+  const decrement$ = sources.DOM
+    .select('.decrement').events('click').map(ev => -1);
+
+  const increment$ = sources.DOM
+    .select('.increment').events('click').map(ev => +1);
+
+  const action$ = Observable.merge(decrement$, increment$);
+  const count$ = action$.startWith(0).scan((x,y) => x+y);
+
+  const vtree$ = count$.map(count =>
+    div([
+      button('.decrement', 'Decrement'),
+      button('.increment', 'Increment'),
+      p('Counter: ' + count)
+    ])
+  );
+  return { DOM: vtree$ };
+}
+```
+
+Visualization drawn using [Raphael.js](http://raphaeljs.com/)
+
 ### Small print
 
 Author: Gleb Bahmutov &copy; 2016
