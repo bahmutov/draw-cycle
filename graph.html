@@ -45,20 +45,46 @@
       const decrement$ = sources.DOM
         .select('#minus').events('click')
         .flatMap(function (ev) {
-          return Rx.Observable.fromPromise(moveEvent().then(x => ev))
+          return Rx.Observable.fromPromise(
+            drawing.moveEvent(drawing.c1, ev)
+          )
         })
-        .map(ev => {
-          console.log('-1');
-          return -1
+        .map(ev => -1)
+        .flatMap(function (x) {
+          return Rx.Observable.fromPromise(
+            drawing.moveEvent(drawing.c3, x)
+          )
         });
 
       const increment$ = sources.DOM
         .select('#plus').events('click')
-        .map(ev => +1);
+        .flatMap(function (ev) {
+          return Rx.Observable.fromPromise(
+            drawing.moveEvent(drawing.c2, ev)
+          )
+        })
+        .map(ev => +1)
+        .flatMap(function (x) {
+          return Rx.Observable.fromPromise(
+            drawing.moveEvent(drawing.c4, x)
+          )
+        });
 
-      const action$ = Rx.Observable.merge(decrement$, increment$);
+      const action$ = Rx.Observable.merge(decrement$, increment$)
+        .flatMap(function (x) {
+          return Rx.Observable.fromPromise(
+            drawing.moveEvent(drawing.c5, x)
+          )
+        });
+
       // model
-      const count$ = action$.startWith(0).scan((x,y) => x+y);
+      const count$ = action$.startWith(0)
+        .scan((x,y) => x+y)
+        .flatMap(function (x) {
+          return Rx.Observable.fromPromise(
+            drawing.moveEvent(drawing.c6, x)
+          )
+        });
 
       // view
       const vtree$ = count$.map(count =>
@@ -67,11 +93,21 @@
           CycleDOM.button('#plus', 'Increment'),
           CycleDOM.p('#counter', 'Counter: ' + count)
         ])
-      );
+      ).flatMap(function (x) {
+        return Rx.Observable.fromPromise(
+          drawing.moveEvent(drawing.c7, x)
+        )
+      });
       return { DOM: vtree$ };
     }
 
     Cycle.run(main, { DOM: CycleDOM.makeDOMDriver('#app') });
+
+    var drawing = {
+      moveEvent: function (_, x) {
+        return Promise.resolve(x)
+      }
+    }
 
     setTimeout(function () {
       // drawing code
@@ -85,8 +121,7 @@
       // Creates canvas 320 × 200 at 10, 50
       var paper = Raphael(0, 0, x, y);
 
-      function moveEvent() {
-        var conn = c1;
+      function moveEvent(conn, value) {
         var n = conn.line.getTotalLength()
         var pos = conn.line.getPointAtLength(0)
         var radius = 5
@@ -94,6 +129,7 @@
         circle.attr({
           cx: pos.x,
           cy: pos.y,
+          fill: '#fff',
           stroke: '#000'
         })
         var counter = 0;
@@ -103,7 +139,7 @@
             if (n < counter) {
               clearInterval(interval);
               circle.remove();
-              resolve();
+              resolve(value);
               return;
             }
             var pos = conn.line.getPointAtLength(counter);
@@ -116,7 +152,7 @@
           interval = setInterval(animate, 10);
         })
       }
-      window.moveEvent = moveEvent;
+      drawing.moveEvent = moveEvent;
 
       var decClicks = paper.rect(400, 150, 100, 50)
       decClicks.attr('fill', '#ffe')
@@ -145,11 +181,11 @@
       // paper.connection(circle, circle2, '#00f')
       // animating movement along path is based on
       // http://jsfiddle.net/gyeSf/17/
-      var c1 = paper.connection(document.querySelector('#minus'), decClicks, '#333')
-      var c2 = paper.connection(document.querySelector('#plus'), incClicks, '#333')
+      drawing.c1 = paper.connection(document.querySelector('#minus'), decClicks, '#333')
+      drawing.c2 = paper.connection(document.querySelector('#plus'), incClicks, '#333')
 
-      var c3 = paper.connection(decClicks, actions, '#333')
-      var c4 = paper.connection(incClicks, actions, '#333')
+      drawing.c3 = paper.connection(decClicks, actions, '#333')
+      drawing.c4 = paper.connection(incClicks, actions, '#333')
 
       // model
       var scan = paper.rect(600, 350, 100, 50)
@@ -160,7 +196,7 @@
       var count$Text = paper.text(690, 410)
       count$Text.attr({ text: 'count$', 'font-size': '15px' })
 
-      var c5 = paper.connection(actions, scan, '#333')
+      drawing.c5 = paper.connection(actions, scan, '#333')
 
       // view
       var vtree = paper.rect(450, 550, 340, 150)
@@ -168,7 +204,8 @@
       vtree.attr('stroke', '#00f')
       var vtreeText = paper.text(460, 625)
       vtreeText.attr({
-        text: 'map\ncount => div([\n' +
+        text: 'map\n' +
+          'count => div([\n' +
           '  button(\'#minus\', \'Decrement\'),\n' +
           '  button(\'#plus\', \'Increment\'),\n' +
           '  p(\'#counter\', \'Counter: \' + count)\n' +
@@ -181,9 +218,9 @@
       var vtree$Text = paper.text(420, 635)
       vtree$Text.attr({ text: 'vtree$', 'font-size': '15px' })
 
-      var c6 = paper.connection(scan, vtree, '#333')
-      var c7 = paper.connection(vtree, document.querySelector('#app'), '#333')
-    }, 0);
+      drawing.c6 = paper.connection(scan, vtree, '#333')
+      drawing.c7 = paper.connection(vtree, document.querySelector('#app'), '#333')
+    }, 1000);
   </script>
 </body>
 </html>
