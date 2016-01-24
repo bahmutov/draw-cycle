@@ -41,6 +41,7 @@
 
   <script>
     function main(sources) {
+      // intent
       const decrement$ = sources.DOM
         .select('#minus').events('click')
         .map(ev => -1);
@@ -50,8 +51,10 @@
         .map(ev => +1);
 
       const action$ = Rx.Observable.merge(decrement$, increment$);
+      // model
       const count$ = action$.startWith(0).scan((x,y) => x+y);
 
+      // view
       const vtree$ = count$.map(count =>
         CycleDOM.div([
           CycleDOM.button('#minus', 'Decrement'),
@@ -87,19 +90,67 @@
       decClicks.attr('fill', '#ffe')
       decClicks.attr('stroke', '#f00')
       var decClicksText = paper.text(450, 175)
-      decClicksText.attr({ text: 'ev => -1', 'font-size': '15px' })
+      decClicksText.attr({ text: 'map\nev => -1', 'font-size': '12px' })
+      var decrementsText = paper.text(550, 160)
+      decrementsText.attr({ text: 'decrements$', 'font-size': '15px' })
 
       var incClicks = paper.rect(400, 250, 100, 50)
       incClicks.attr('fill', '#ffe')
       incClicks.attr('stroke', '#f00')
       var incClicksText = paper.text(450, 275)
-      incClicksText.attr({ text: 'ev => +1', 'font-size': '15px' })
+      incClicksText.attr({ text: 'map\nev => +1', 'font-size': '15px' })
+      var incrementsText = paper.text(550, 285)
+      incrementsText.attr({ text: 'increments$', 'font-size': '15px' })
+
+      var actions = paper.rect(600, 200, 100, 50)
+      actions.attr('fill', '#ffe')
+      actions.attr('stroke', '#f00')
+      var actionsText = paper.text(650, 225)
+      actionsText.attr({ text: 'merge', 'font-size': '15px' })
+      var actions$Text = paper.text(690, 260)
+      actions$Text.attr({ text: 'actions$', 'font-size': '15px' })
 
       // paper.connection(circle, circle2, '#00f')
       // animating movement along path is based on
       // http://jsfiddle.net/gyeSf/17/
-      var c1 = paper.connection(document.querySelector('#minus'), decClicks, '#00f')
-      var c2 = paper.connection(document.querySelector('#plus'), incClicks, '#00f')
+      var c1 = paper.connection(document.querySelector('#minus'), decClicks, '#333')
+      var c2 = paper.connection(document.querySelector('#plus'), incClicks, '#333')
+
+      var c3 = paper.connection(decClicks, actions, '#333')
+      var c4 = paper.connection(incClicks, actions, '#333')
+
+      // model
+      var scan = paper.rect(600, 350, 100, 50)
+      scan.attr('fill', '#ffe')
+      scan.attr('stroke', '#0f0')
+      var scanText = paper.text(650, 375)
+      scanText.attr({ text: 'scan\n(x,y) => x+y', 'font-size': '15px' })
+      var count$Text = paper.text(690, 410)
+      count$Text.attr({ text: 'count$', 'font-size': '15px' })
+
+      var c5 = paper.connection(actions, scan, '#333')
+
+      // view
+      var vtree = paper.rect(450, 550, 300, 150)
+      vtree.attr('fill', '#ffe')
+      vtree.attr('stroke', '#00f')
+      var vtreeText = paper.text(600, 625)
+      vtreeText.attr({
+        text: 'map\ncount => div([\n' +
+          '  button(\'#minus\', \'Decrement\'),\n' +
+          '  button(\'#plus\', \'Increment\'),\n' +
+          '  p(\'#counter\', \'Counter: \' + count)\n' +
+          '])',
+        'font-size': '15px',
+        'font-family': 'monospace',
+        'white-space': 'pre'
+      })
+      var vtree$Text = paper.text(420, 635)
+      vtree$Text.attr({ text: 'vtree$', 'font-size': '15px' })
+
+      var c6 = paper.connection(scan, vtree, '#333')
+
+      var c7 = paper.connection(vtree, document.querySelector('#app'), '#333')
 
       var n = c1.line.getTotalLength()
       console.log(n)
