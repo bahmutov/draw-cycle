@@ -28,6 +28,7 @@
     padding: 20px;
     font-size: large;
     margin: 20px;
+    display: block;
   }
   #info {
     position: relative;
@@ -81,7 +82,7 @@
             drawing.moveEvent(drawing.c1, 'event', ev)
           )
         })
-        .map(ev => -1)
+        .map(function (ev) { return -1 })
         .flatMap(function (x) {
           return Rx.Observable.fromPromise(
             drawing.moveEvent(drawing.c3, x, x)
@@ -95,7 +96,7 @@
             drawing.moveEvent(drawing.c2, 'event', ev)
           )
         })
-        .map(ev => +1)
+        .map(function (ev) { return +1 })
         .flatMap(function (x) {
           return Rx.Observable.fromPromise(
             drawing.moveEvent(drawing.c4, x, x)
@@ -111,8 +112,8 @@
 
       // model
       const count$ = action$.startWith(0)
-        .scan((x,y) => x+y)
-        .tap(x => drawing.setValue(x))
+        .scan(function (x,y) { return x+y })
+        .tap(function (x) { drawing.setValue(x) })
         .flatMap(function (x) {
           return Rx.Observable.fromPromise(
             drawing.moveEvent(drawing.c6, x, x)
@@ -120,13 +121,13 @@
         });
 
       // view
-      const vtree$ = count$.map(count =>
-        CycleDOM.div([
+      const vtree$ = count$.map(function (count) {
+        return CycleDOM.div([
           CycleDOM.button('#minus', 'Decrement'),
           CycleDOM.button('#plus', 'Increment'),
           CycleDOM.p('#counter', 'Counter: ' + count)
         ])
-      ).flatMap(function (x) {
+      }).flatMap(function (x) {
         return Rx.Observable.fromPromise(
           drawing.moveEvent(drawing.c7, 'VDom', x, vdomToHtml(x))
         )
@@ -151,6 +152,10 @@
       g = d.getElementsByTagName('body')[0],
       x = w.innerWidth || e.clientWidth || g.clientWidth,
       y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+
+      if (y < 700) {
+        y = 700
+      }
 
       // Creates canvas 320 × 200 at 10, 50
       var paper = Raphael(0, 0, x, y);
