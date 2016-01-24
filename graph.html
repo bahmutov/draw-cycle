@@ -46,13 +46,13 @@
         .select('#minus').events('click')
         .flatMap(function (ev) {
           return Rx.Observable.fromPromise(
-            drawing.moveEvent(drawing.c1, ev)
+            drawing.moveEvent(drawing.c1, 'event', ev)
           )
         })
         .map(ev => -1)
         .flatMap(function (x) {
           return Rx.Observable.fromPromise(
-            drawing.moveEvent(drawing.c3, x)
+            drawing.moveEvent(drawing.c3, x, x)
           )
         });
 
@@ -60,20 +60,20 @@
         .select('#plus').events('click')
         .flatMap(function (ev) {
           return Rx.Observable.fromPromise(
-            drawing.moveEvent(drawing.c2, ev)
+            drawing.moveEvent(drawing.c2, 'event', ev)
           )
         })
         .map(ev => +1)
         .flatMap(function (x) {
           return Rx.Observable.fromPromise(
-            drawing.moveEvent(drawing.c4, x)
+            drawing.moveEvent(drawing.c4, x, x)
           )
         });
 
       const action$ = Rx.Observable.merge(decrement$, increment$)
         .flatMap(function (x) {
           return Rx.Observable.fromPromise(
-            drawing.moveEvent(drawing.c5, x)
+            drawing.moveEvent(drawing.c5, x, x)
           )
         });
 
@@ -82,7 +82,7 @@
         .scan((x,y) => x+y)
         .flatMap(function (x) {
           return Rx.Observable.fromPromise(
-            drawing.moveEvent(drawing.c6, x)
+            drawing.moveEvent(drawing.c6, x, x)
           )
         });
 
@@ -95,7 +95,7 @@
         ])
       ).flatMap(function (x) {
         return Rx.Observable.fromPromise(
-          drawing.moveEvent(drawing.c7, x)
+          drawing.moveEvent(drawing.c7, 'vtree', x)
         )
       });
       return { DOM: vtree$ };
@@ -104,7 +104,7 @@
     Cycle.run(main, { DOM: CycleDOM.makeDOMDriver('#app') });
 
     var drawing = {
-      moveEvent: function (_, x) {
+      moveEvent: function (_, label, x) {
         return Promise.resolve(x)
       }
     }
@@ -121,17 +121,24 @@
       // Creates canvas 320 × 200 at 10, 50
       var paper = Raphael(0, 0, x, y);
 
-      function moveEvent(conn, value) {
+      function moveEvent(conn, labelText, value) {
         var n = conn.line.getTotalLength()
         var pos = conn.line.getPointAtLength(0)
-        var radius = 5
-        var circle = paper.circle(pos.x, pos.y, 10);
+        var radius = typeof labelText === 'string' ? 20 : 20
+        var circle = paper.circle(pos.x, pos.y, radius);
         circle.attr({
           cx: pos.x,
           cy: pos.y,
           fill: '#fff',
           stroke: '#000'
         })
+
+        var label = paper.text()
+        label.attr({
+          text: labelText,
+          'font-size': '12px'
+        })
+
         var counter = 0;
         return new Promise(function (resolve) {
           var interval;
@@ -139,6 +146,7 @@
             if (n < counter) {
               clearInterval(interval);
               circle.remove();
+              label.remove();
               resolve(value);
               return;
             }
@@ -146,6 +154,10 @@
             circle.attr({
               cx: pos.x,
               cy: pos.y
+            })
+            label.attr({
+              x: pos.x,
+              y: pos.y
             })
             counter += 1;
           }
