@@ -131,10 +131,10 @@
       var c5 = paper.connection(actions, scan, '#333')
 
       // view
-      var vtree = paper.rect(450, 550, 300, 150)
+      var vtree = paper.rect(450, 550, 340, 150)
       vtree.attr('fill', '#ffe')
       vtree.attr('stroke', '#00f')
-      var vtreeText = paper.text(600, 625)
+      var vtreeText = paper.text(460, 625)
       vtreeText.attr({
         text: 'map\ncount => div([\n' +
           '  button(\'#minus\', \'Decrement\'),\n' +
@@ -143,7 +143,8 @@
           '])',
         'font-size': '15px',
         'font-family': 'monospace',
-        'white-space': 'pre'
+        'white-space': 'pre',
+        'text-anchor': 'start'
       })
       var vtree$Text = paper.text(420, 635)
       vtree$Text.attr({ text: 'vtree$', 'font-size': '15px' })
