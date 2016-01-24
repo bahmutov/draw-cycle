@@ -269,7 +269,7 @@
       var valueText = paper.text(680, 420)
       valueText.attr({ text: 'value\n0', 'font-size': '15px' })
       drawing.setValue = function (value) {
-        valueText.attr('text', `value\n${value}`)
+        valueText.attr('text', 'value\n' + value)
       }
 
       var count$Text = paper.text(520, 410)
