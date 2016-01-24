@@ -1,6 +1,8 @@
 # draw-cycle
 > Simple Cycle.js application visualized: streams, events, DOM
 
+Try yourself at [glebbahmutov.com/draw-cycle](https://glebbahmutov.com/draw-cycle/)
+
 ![demo.gif](demo.gif)
 
 Full video in original resolution at [https://youtu.be/-5-xyhd5fbQ](https://youtu.be/-5-xyhd5fbQ)
