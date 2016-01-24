@@ -12,7 +12,7 @@
     width: 300px;
     height: 300px;
     border: 1px solid black;
-    transform: translateY(100px) perspective( 300px ) rotateY( -45deg );
+    transform: translateY(100px) perspective( 300px ) rotateY( -35deg );
   }
   svg {
     z-index: -1;
@@ -21,70 +21,89 @@
     width: 250px;
     margin: 0 auto;
   }
+  #counter {
+    margin-left: 200px;
+  }
   button {
     padding: 20px;
     font-size: large;
     margin: 20px;
   }
   </style>
+  <script src="node_modules/rx/dist/rx.all.js"></script>
+  <script src="node_modules/@cycle/core/dist/cycle.js"></script>
+  <script src="node_modules/@cycle/dom/dist/cycle-dom.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.4/raphael-min.js"></script>
   <script src="connection.js"></script>
 </head>
 <body>
-  <div id="app">
-    <center>this is app</center>
-    <div id="controls">
-      <button id="minus">-</button>
-      <span>counter</span>
-      <button id="plus">+</button>
-    </div>
-  </div>
+  <div id="app"></div>
 
   <script>
-    document.querySelector('#minus').addEventListener('click', function () {
-      console.log('clicked minus')
-    })
+    function main(sources) {
+      const decrement$ = sources.DOM
+        .select('#minus').events('click').map(ev => -1);
 
-    // drawing code
-    var w = window,
-    d = document,
-    e = d.documentElement,
-    g = d.getElementsByTagName('body')[0],
-    x = w.innerWidth || e.clientWidth || g.clientWidth,
-    y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+      const increment$ = sources.DOM
+        .select('#plus').events('click').map(ev => +1);
 
-    // Creates canvas 320 × 200 at 10, 50
-    var paper = Raphael(0, 0, x, y);
+      const action$ = Rx.Observable.merge(decrement$, increment$);
+      const count$ = action$.startWith(0).scan((x,y) => x+y);
 
-    // Creates circle at x = 50, y = 40, with radius 10
-    var circle = paper.circle(50, 40, 10);
+      const vtree$ = count$.map(count =>
+        CycleDOM.div([
+          CycleDOM.button('#minus', 'Decrement'),
+          CycleDOM.button('#plus', 'Increment'),
+          CycleDOM.p('#counter', 'Counter: ' + count)
+        ])
+      );
+      return { DOM: vtree$ };
+    }
 
-    // Sets the fill attribute of the circle to red (#f00)
-    circle.attr("fill", "#f00");
+    Cycle.run(main, { DOM: CycleDOM.makeDOMDriver('#app') });
 
-    // Sets the stroke attribute of the circle to white
-    // circle.attr("stroke", "#fff");
 
-    // var circle2 = paper.circle(150, 140, 10);
-    // circle2.attr("fill", "#0f0");
+    setTimeout(function () {
+      // drawing code
+      var w = window,
+      d = document,
+      e = d.documentElement,
+      g = d.getElementsByTagName('body')[0],
+      x = w.innerWidth || e.clientWidth || g.clientWidth,
+      y = w.innerHeight|| e.clientHeight|| g.clientHeight;
 
-    var r1 = paper.rect(400, 300, 100, 50)
-    r1.attr('fill', '#ffe')
-    r1.attr('stroke', '#f00')
+      // Creates canvas 320 × 200 at 10, 50
+      var paper = Raphael(0, 0, x, y);
 
-    var t1 = paper.text(450, 325)
-    t1.attr('text', 'e => e.target.value')
+      // Creates circle at x = 50, y = 40, with radius 10
+      var circle = paper.circle(50, 40, 10);
 
-    // paper.connection(circle, circle2, '#00f')
-    // animating movement along path is based on
-    // http://jsfiddle.net/gyeSf/17/
-    var c1 = paper.connection(document.querySelector('button'), r1, '#00f')
+      // Sets the fill attribute of the circle to red (#f00)
+      circle.attr("fill", "#f00");
 
-    var n = c1.line.getTotalLength()
-    console.log(n)
-    var pos = c1.line.getPointAtLength(0)
-    circle.attr({cx: pos.x, cy: pos.y})
+      // Sets the stroke attribute of the circle to white
+      // circle.attr("stroke", "#fff");
 
+      // var circle2 = paper.circle(150, 140, 10);
+      // circle2.attr("fill", "#0f0");
+
+      var r1 = paper.rect(400, 300, 100, 50)
+      r1.attr('fill', '#ffe')
+      r1.attr('stroke', '#f00')
+
+      var t1 = paper.text(450, 325)
+      t1.attr('text', 'e => e.target.value')
+
+      // paper.connection(circle, circle2, '#00f')
+      // animating movement along path is based on
+      // http://jsfiddle.net/gyeSf/17/
+      var c1 = paper.connection(document.querySelector('button'), r1, '#00f')
+
+      var n = c1.line.getTotalLength()
+      console.log(n)
+      var pos = c1.line.getPointAtLength(0)
+      circle.attr({cx: pos.x, cy: pos.y})
+    }, 0);
   </script>
 </body>
 </html>
