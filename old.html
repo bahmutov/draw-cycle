@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TodoMVC sideways</title>
+  <style>
+  #app {
+    margin: 20px 50px;
+    width: 300px;
+    height: 300px;
+    background-color: #eeeeff;
+    transform: translateY(100px) perspective( 300px ) rotateY( -45deg );
+  }
+  #controls {
+    width: 250px;
+    margin: 0 auto;
+  }
+  button {
+    padding: 20px;
+    font-size: large;
+    margin: 20px;
+  }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <center>this is app</center>
+    <div id="controls">
+      <button>-</button>
+      <span>counter</span>
+      <button>+</button>
+    </div>
+  </div>
+</body>
+</html>

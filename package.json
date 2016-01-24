@@ -1,7 +1,7 @@
 {
-  "name": "todomvc-side",
+  "name": "draw-cycle",
   "version": "1.0.0",
-  "description": "",
+  "description": "Simple Cycle.js application visualized: streams, events, DOM",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,6 +9,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "public": false,
   "dependencies": {
     "@cycle/core": "6.0.0",
     "@cycle/dom": "9.0.2",
