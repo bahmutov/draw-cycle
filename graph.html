@@ -35,6 +35,7 @@
   <script src="node_modules/@cycle/dom/dist/cycle-dom.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.4/raphael-min.js"></script>
   <script src="connection.js"></script>
+  <script src="vdom-to-html.js"></script>
 </head>
 <body>
   <div id="app"></div>
@@ -80,6 +81,7 @@
       // model
       const count$ = action$.startWith(0)
         .scan((x,y) => x+y)
+        .tap(x => drawing.setValue(x))
         .flatMap(function (x) {
           return Rx.Observable.fromPromise(
             drawing.moveEvent(drawing.c6, x, x)
@@ -95,7 +97,7 @@
         ])
       ).flatMap(function (x) {
         return Rx.Observable.fromPromise(
-          drawing.moveEvent(drawing.c7, 'vtree', x)
+          drawing.moveEvent(drawing.c7, 'VDom', x, vdomToHtml(x))
         )
       });
       return { DOM: vtree$ };
@@ -104,6 +106,7 @@
     Cycle.run(main, { DOM: CycleDOM.makeDOMDriver('#app') });
 
     var drawing = {
+      setValue: function () {},
       moveEvent: function (_, label, x) {
         return Promise.resolve(x)
       }
@@ -121,7 +124,7 @@
       // Creates canvas 320 × 200 at 10, 50
       var paper = Raphael(0, 0, x, y);
 
-      function moveEvent(conn, labelText, value) {
+      function moveEvent(conn, labelText, value, bottomText) {
         var n = conn.line.getTotalLength()
         var pos = conn.line.getPointAtLength(0)
         var radius = typeof labelText === 'string' ? 20 : 20
@@ -139,6 +142,18 @@
           'font-size': '12px'
         })
 
+        var bottomLabel;
+        if (bottomText) {
+          bottomLabel = paper.text()
+          bottomLabel.attr({
+            text: bottomText,
+            'font-size': '12px',
+            'font-family': 'monospace',
+            'white-space': 'pre',
+            'text-anchor': 'end'
+          })
+        }
+
         var counter = 0;
         return new Promise(function (resolve) {
           var interval;
@@ -147,6 +162,9 @@
               clearInterval(interval);
               circle.remove();
               label.remove();
+              if (bottomLabel) {
+                bottomLabel.remove()
+              }
               resolve(value);
               return;
             }
@@ -159,6 +177,12 @@
               x: pos.x,
               y: pos.y
             })
+            if (bottomLabel) {
+              bottomLabel.attr({
+                x: pos.x - 50,
+                y: pos.y + 60
+              })
+            }
             counter += 1;
           }
           interval = setInterval(animate, 10);
@@ -205,6 +229,13 @@
       scan.attr('stroke', '#0f0')
       var scanText = paper.text(650, 375)
       scanText.attr({ text: 'scan\n(x,y) => x+y', 'font-size': '15px' })
+
+      var valueText = paper.text(730, 370)
+      valueText.attr({ text: 'value\n0', 'font-size': '15px' })
+      drawing.setValue = function (value) {
+        valueText.attr('text', `value\n${value}`)
+      }
+
       var count$Text = paper.text(690, 410)
       count$Text.attr({ text: 'count$', 'font-size': '15px' })
 
