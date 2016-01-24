@@ -4,7 +4,8 @@
   "description": "Simple Cycle.js application visualized: streams, events, DOM",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "grunty grunt-gh-pages gh-pages deploy.json"
   },
   "keywords": [],
   "author": "",
@@ -14,5 +15,9 @@
     "@cycle/core": "6.0.0",
     "@cycle/dom": "9.0.2",
     "rx": "4.0.7"
+  },
+  "devDependencies": {
+    "grunt-gh-pages": "1.0.0",
+    "grunty": "0.2.0"
   }
 }
