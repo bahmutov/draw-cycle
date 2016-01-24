@@ -42,10 +42,12 @@
   <script>
     function main(sources) {
       const decrement$ = sources.DOM
-        .select('#minus').events('click').map(ev => -1);
+        .select('#minus').events('click')
+        .map(ev => -1);
 
       const increment$ = sources.DOM
-        .select('#plus').events('click').map(ev => +1);
+        .select('#plus').events('click')
+        .map(ev => +1);
 
       const action$ = Rx.Observable.merge(decrement$, increment$);
       const count$ = action$.startWith(0).scan((x,y) => x+y);
@@ -81,23 +83,23 @@
       // Sets the fill attribute of the circle to red (#f00)
       circle.attr("fill", "#f00");
 
-      // Sets the stroke attribute of the circle to white
-      // circle.attr("stroke", "#fff");
+      var decClicks = paper.rect(400, 150, 100, 50)
+      decClicks.attr('fill', '#ffe')
+      decClicks.attr('stroke', '#f00')
+      var decClicksText = paper.text(450, 175)
+      decClicksText.attr({ text: 'ev => -1', 'font-size': '15px' })
 
-      // var circle2 = paper.circle(150, 140, 10);
-      // circle2.attr("fill", "#0f0");
-
-      var r1 = paper.rect(400, 300, 100, 50)
-      r1.attr('fill', '#ffe')
-      r1.attr('stroke', '#f00')
-
-      var t1 = paper.text(450, 325)
-      t1.attr('text', 'e => e.target.value')
+      var incClicks = paper.rect(400, 250, 100, 50)
+      incClicks.attr('fill', '#ffe')
+      incClicks.attr('stroke', '#f00')
+      var incClicksText = paper.text(450, 275)
+      incClicksText.attr({ text: 'ev => +1', 'font-size': '15px' })
 
       // paper.connection(circle, circle2, '#00f')
       // animating movement along path is based on
       // http://jsfiddle.net/gyeSf/17/
-      var c1 = paper.connection(document.querySelector('button'), r1, '#00f')
+      var c1 = paper.connection(document.querySelector('#minus'), decClicks, '#00f')
+      var c2 = paper.connection(document.querySelector('#plus'), incClicks, '#00f')
 
       var n = c1.line.getTotalLength()
       console.log(n)
