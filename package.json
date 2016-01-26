@@ -7,10 +7,18 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "grunty grunt-gh-pages gh-pages deploy.json"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["cycle", "cycle.js", "demo"],
+  "author": "Gleb Bahmutov <gleb.bahmutov@gmail.com>",
+  "license": "MIT",
   "public": false,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:bahmutov/draw-cycle.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bahmutov/draw-cycle/issues"
+  },
+  "homepage": "https://github.com/bahmutov/draw-cycle",
   "dependencies": {
     "@cycle/core": "6.0.0",
     "@cycle/dom": "9.0.2",
