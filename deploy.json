@@ -5,6 +5,7 @@
     },
     "src": [
       "index.html",
+      "node_modules/es6-promise/dist/es6-promise.js",
       "node_modules/rx/dist/rx.all.js",
       "node_modules/@cycle/core/dist/cycle.js",
       "node_modules/@cycle/dom/dist/cycle-dom.js",
