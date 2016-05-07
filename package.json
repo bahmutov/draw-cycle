@@ -5,9 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "grunty grunt-gh-pages gh-pages deploy.json"
+    "deploy": "grunty grunt-gh-pages gh-pages deploy.json",
+    "issues": "git-issues"
   },
-  "keywords": ["cycle", "cycle.js", "demo"],
+  "keywords": [
+    "cycle",
+    "cycle.js",
+    "demo"
+  ],
   "author": "Gleb Bahmutov <gleb.bahmutov@gmail.com>",
   "license": "MIT",
   "public": false,
@@ -26,6 +31,7 @@
     "rx": "4.0.7"
   },
   "devDependencies": {
+    "git-issues": "1.2.0",
     "grunt-gh-pages": "1.0.0",
     "grunty": "0.2.0"
   }
